@@ -37,32 +37,44 @@ footer{text-align:center;border-top:1px solid var(--line);padding:18px;color:#72
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbyNlHdx7o-ME-ZpAiYQv9X4DpOH9JwgkbYjAFqc6itAd7cY8HvViO4EMK1Il2ZAkwdw/exec";
 let rows=[],active="Tümü";
+
 function clean(v){return v==null?"":String(v).trim()}
-async function load(){
- try{
-  const response=await fetch(API_URL+"?t="+Date.now(),{cache:"no-store"});
-  if(!response.ok) throw new Error("API HTTP "+response.status);
-  const data=await response.json();
-  rows=Array.isArray(data)?data.map(p=>({marka:clean(p.marka),model:clean(p.model),ozellik:clean(p.ozellik),fiyat:clean(p.fiyat),stok:clean(p.stok),kayitDurumu:clean(p.kayitDurumu),fotograf:clean(p.fotograf)})):[];
-  document.getElementById("status").textContent="Fiyatlar Google Sheets'ten güncel olarak alınıyor.";
-  render();
- }catch(e){
-  console.error(e);
-  document.getElementById("status").textContent="Fiyat listesi alınamadı. Google Sheets bağlantısını kontrol edin.";
+function load(){
+  const callback="miKirenCallback_"+Date.now();
+  window[callback]=function(data){
+    try{
+      rows=Array.isArray(data)?data.map(p=>({
+        marka:clean(p.marka),model:clean(p.model),ozellik:clean(p.ozellik),
+        fiyat:clean(p.fiyat),stok:clean(p.stok),kayitDurumu:clean(p.kayitDurumu),
+        fotograf:clean(p.fotograf)
+      })):[];
+      document.getElementById("status").textContent="Fiyatlar Google Sheets'ten güncel olarak alınıyor.";
+      render();
+    }catch(e){showError()}
+    delete window[callback];
+    const s=document.getElementById("apiScript"); if(s)s.remove();
+  };
+  const s=document.createElement("script");
+  s.id="apiScript";
+  s.src=API_URL+"?callback="+callback+"&t="+Date.now();
+  s.onerror=showError;
+  document.body.appendChild(s);
+}
+function showError(){
+  document.getElementById("status").textContent="Fiyat listesi alınamadı. Apps Script yayın ayarlarını kontrol edin.";
   document.getElementById("grid").innerHTML='<div class="empty">Şu anda fiyat listesi yüklenemiyor.</div>';
- }
 }
 function render(){
- const q=document.getElementById("q").value.toLowerCase();
- const brands=["Tümü",...new Set(rows.map(x=>x.marka).filter(Boolean))];
- document.getElementById("filters").innerHTML=brands.map(b=>`<button class="filter ${b===active?'active':''}" data-brand="${b.replaceAll('"','&quot;')}">${b}</button>`).join("");
- document.querySelectorAll(".filter").forEach(btn=>btn.onclick=()=>{active=btn.dataset.brand;render()});
- const list=rows.filter(x=>(active==="Tümü"||x.marka===active)&&[x.marka,x.model,x.ozellik].join(" ").toLowerCase().includes(q));
- document.getElementById("grid").innerHTML=list.length?list.map(x=>{
-  const msg=encodeURIComponent(`Merhaba, Mi Kiren Technology Store'dan ${x.model} ${x.ozellik} için fiyat ve stok bilgisi almak istiyorum.`);
-  const img=x.fotograf?`<img class="product-image" src="${x.fotograf}" alt="${x.model}" loading="lazy" onclick="openImage(this.src,this.alt)" onerror="this.style.display='none'">`:"";
-  return `<article class="card">${img}<span class="tag">${x.marka}</span><h3>${x.model}</h3><div class="spec">${x.ozellik}</div><div class="price">${x.fiyat}</div><div class="stock">● ${x.stok||"Bilgi yok"}</div>${x.kayitDurumu?`<div class="record">Kayıt Durumu: ${x.kayitDurumu}</div>`:""}<a class="product-wa" target="_blank" href="https://wa.me/905367052869?text=${msg}">WhatsApp'tan Fiyat Sor</a></article>`;
- }).join(""):'<div class="empty">Aradığınız ürün bulunamadı.</div>';
+  const q=document.getElementById("q").value.toLowerCase();
+  const brands=["Tümü",...new Set(rows.map(x=>x.marka).filter(Boolean))];
+  document.getElementById("filters").innerHTML=brands.map(b=>`<button class="filter ${b===active?'active':''}" data-brand="${b.replaceAll('"','&quot;')}">${b}</button>`).join("");
+  document.querySelectorAll(".filter").forEach(btn=>btn.onclick=()=>{active=btn.dataset.brand;render()});
+  const list=rows.filter(x=>(active==="Tümü"||x.marka===active)&&[x.marka,x.model,x.ozellik].join(" ").toLowerCase().includes(q));
+  document.getElementById("grid").innerHTML=list.length?list.map(x=>{
+    const msg=encodeURIComponent(`Merhaba, Mi Kiren Technology Store'dan ${x.model} ${x.ozellik} için fiyat ve stok bilgisi almak istiyorum.`);
+    const img=x.fotograf?`<img class="product-image" src="${x.fotograf}" alt="${x.model}" loading="lazy" onclick="openImage(this.src,this.alt)" onerror="this.style.display='none'">`:"";
+    return `<article class="card">${img}<span class="tag">${x.marka}</span><h3>${x.model}</h3><div class="spec">${x.ozellik}</div><div class="price">${x.fiyat}</div><div class="stock">● ${x.stok||"Bilgi yok"}</div>${x.kayitDurumu?`<div class="record">Kayıt Durumu: ${x.kayitDurumu}</div>`:""}<a class="product-wa" target="_blank" href="https://wa.me/905367052869?text=${msg}">WhatsApp'tan Fiyat Sor</a></article>`;
+  }).join(""):'<div class="empty">Aradığınız ürün bulunamadı.</div>';
 }
 function openImage(src,alt){document.getElementById("modalImg").src=src;document.getElementById("modalImg").alt=alt;document.getElementById("modal").style.display="flex"}
 document.getElementById("q").addEventListener("input",render);
