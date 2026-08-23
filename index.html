@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mi Kiren Technology Store | Güncel Fiyatlar</title>
 <style>
 :root{--g:#d9ad45;--g2:#f4d27b;--card:#111419;--line:#252a31;--muted:#9da3ad}
@@ -34,50 +33,61 @@ footer{text-align:center;border-top:1px solid var(--line);padding:18px;color:#72
 </main>
 <footer>© 2026 Mi Kiren Technology Store</footer>
 <div id="modal" class="modal" onclick="this.style.display='none'"><img id="modalImg" alt=""></div>
+
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbyNlHdx7o-ME-ZpAiYQv9X4DpOH9JwgkbYjAFqc6itAd7cY8HvViO4EMK1Il2ZAkwdw/exec";
+const SHEET_ID="1DikX54vdznQnHi7o8TNDJQBqklF4_NJN_TES4GbVjpA";
+const SHEET_GID="0";
 let rows=[],active="Tümü";
 
 function clean(v){return v==null?"":String(v).trim()}
-function load(){
-  const callback="miKirenCallback_"+Date.now();
-  window[callback]=function(data){
+function cell(row,i){
+  if(i<0 || !row.c || !row.c[i]) return "";
+  return clean(row.c[i].v ?? row.c[i].f ?? "");
+}
+function loadSheet(){
+  const cb="miKirenSheet_"+Date.now();
+  window[cb]=function(resp){
     try{
-      rows=Array.isArray(data)?data.map(p=>({
-        marka:clean(p.marka),model:clean(p.model),ozellik:clean(p.ozellik),
-        fiyat:clean(p.fiyat),stok:clean(p.stok),kayitDurumu:clean(p.kayitDurumu),
-        fotograf:clean(p.fotograf)
-      })):[];
+      if(!resp || !resp.table) throw new Error("Google Sheets verisi gelmedi");
+      const cols=resp.table.cols.map(c=>clean(c.label).toLowerCase());
+      const idx=name=>cols.indexOf(name.toLowerCase());
+      const iMarka=idx("marka"), iModel=idx("model"), iOzellik=idx("özellik"),
+            iFiyat=idx("fiyat"), iStok=idx("stok"), iKayit=idx("kayıt durumu"),
+            iFoto=idx("fotoğraf url");
+      rows=(resp.table.rows||[]).map(r=>({
+        marka:cell(r,iMarka),model:cell(r,iModel),ozellik:cell(r,iOzellik),
+        fiyat:cell(r,iFiyat),stok:cell(r,iStok),kayitDurumu:cell(r,iKayit),fotograf:cell(r,iFoto)
+      })).filter(x=>x.model);
       document.getElementById("status").textContent="Fiyatlar Google Sheets'ten güncel olarak alınıyor.";
       render();
-    }catch(e){showError()}
-    delete window[callback];
-    const s=document.getElementById("apiScript"); if(s)s.remove();
+    }catch(e){console.error(e);showError()}
+    delete window[cb];
+    const old=document.getElementById("sheetScript");if(old)old.remove();
   };
   const s=document.createElement("script");
-  s.id="apiScript";
-  s.src=API_URL+"?callback="+callback+"&t="+Date.now();
+  s.id="sheetScript";
   s.onerror=showError;
-  document.body.appendChild(s);
+  s.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}&gid=${SHEET_GID}&headers=1&t=${Date.now()}`;
+  document.head.appendChild(s);
 }
 function showError(){
-  document.getElementById("status").textContent="Fiyat listesi alınamadı. Apps Script yayın ayarlarını kontrol edin.";
-  document.getElementById("grid").innerHTML='<div class="empty">Şu anda fiyat listesi yüklenemiyor.</div>';
+ document.getElementById("status").textContent="Fiyat listesi alınamadı. Google Sheets'in web'de yayınlandığını kontrol edin.";
+ document.getElementById("grid").innerHTML='<div class="empty">Şu anda fiyat listesi yüklenemiyor.</div>';
 }
 function render(){
-  const q=document.getElementById("q").value.toLowerCase();
-  const brands=["Tümü",...new Set(rows.map(x=>x.marka).filter(Boolean))];
-  document.getElementById("filters").innerHTML=brands.map(b=>`<button class="filter ${b===active?'active':''}" data-brand="${b.replaceAll('"','&quot;')}">${b}</button>`).join("");
-  document.querySelectorAll(".filter").forEach(btn=>btn.onclick=()=>{active=btn.dataset.brand;render()});
-  const list=rows.filter(x=>(active==="Tümü"||x.marka===active)&&[x.marka,x.model,x.ozellik].join(" ").toLowerCase().includes(q));
-  document.getElementById("grid").innerHTML=list.length?list.map(x=>{
-    const msg=encodeURIComponent(`Merhaba, Mi Kiren Technology Store'dan ${x.model} ${x.ozellik} için fiyat ve stok bilgisi almak istiyorum.`);
-    const img=x.fotograf?`<img class="product-image" src="${x.fotograf}" alt="${x.model}" loading="lazy" onclick="openImage(this.src,this.alt)" onerror="this.style.display='none'">`:"";
-    return `<article class="card">${img}<span class="tag">${x.marka}</span><h3>${x.model}</h3><div class="spec">${x.ozellik}</div><div class="price">${x.fiyat}</div><div class="stock">● ${x.stok||"Bilgi yok"}</div>${x.kayitDurumu?`<div class="record">Kayıt Durumu: ${x.kayitDurumu}</div>`:""}<a class="product-wa" target="_blank" href="https://wa.me/905367052869?text=${msg}">WhatsApp'tan Fiyat Sor</a></article>`;
-  }).join(""):'<div class="empty">Aradığınız ürün bulunamadı.</div>';
+ const q=document.getElementById("q").value.toLowerCase();
+ const brands=["Tümü",...new Set(rows.map(x=>x.marka).filter(Boolean))];
+ document.getElementById("filters").innerHTML=brands.map(b=>`<button class="filter ${b===active?'active':''}" data-brand="${b.replaceAll('"','&quot;')}">${b}</button>`).join("");
+ document.querySelectorAll(".filter").forEach(btn=>btn.onclick=()=>{active=btn.dataset.brand;render()});
+ const list=rows.filter(x=>(active==="Tümü"||x.marka===active)&&[x.marka,x.model,x.ozellik].join(" ").toLowerCase().includes(q));
+ document.getElementById("grid").innerHTML=list.length?list.map(x=>{
+   const msg=encodeURIComponent(`Merhaba, Mi Kiren Technology Store'dan ${x.model} ${x.ozellik} için fiyat ve stok bilgisi almak istiyorum.`);
+   const img=x.fotograf?`<img class="product-image" src="${x.fotograf}" alt="${x.model}" loading="lazy" onclick="openImage(this.src,this.alt)" onerror="this.style.display='none'">`:"";
+   return `<article class="card">${img}<span class="tag">${x.marka}</span><h3>${x.model}</h3><div class="spec">${x.ozellik}</div><div class="price">${x.fiyat}</div><div class="stock">● ${x.stok||"Bilgi yok"}</div>${x.kayitDurumu?`<div class="record">Kayıt Durumu: ${x.kayitDurumu}</div>`:""}<a class="product-wa" target="_blank" href="https://wa.me/905367052869?text=${msg}">WhatsApp'tan Fiyat Sor</a></article>`;
+ }).join(""):'<div class="empty">Aradığınız ürün bulunamadı.</div>';
 }
 function openImage(src,alt){document.getElementById("modalImg").src=src;document.getElementById("modalImg").alt=alt;document.getElementById("modal").style.display="flex"}
 document.getElementById("q").addEventListener("input",render);
-load();
+loadSheet();
 </script>
 </body></html>
