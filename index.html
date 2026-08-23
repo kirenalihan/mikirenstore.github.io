@@ -1,55 +1,41 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mi Kiren Technology Store</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mi Kiren Technology Store | Güncel Fiyatlar</title>
 <style>
-:root{--g:#d9ad45;--g2:#f4d27b;--bg:#08090b;--card:#111419;--line:#252a31;--muted:#9da3ad}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#1c1d21,#08090b 48%);color:#fff;font-family:Arial,sans-serif}.wrap{width:min(1120px,92%);margin:auto}
-header{border-bottom:1px solid var(--line);padding:18px 0}.brand{display:flex;align-items:center;gap:14px}.brand img{width:74px;height:74px;object-fit:contain;border-radius:16px}.brand h1{margin:0;font-size:23px}.brand small{display:block;color:var(--g2);letter-spacing:2px;margin-top:5px}
+:root{--g:#d9ad45;--g2:#f4d27b;--card:#111419;--line:#252a31;--muted:#9da3ad}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#1c1d21,#08090b 48%);color:#fff;font-family:Arial,sans-serif}
+.wrap{width:min(1120px,92%);margin:auto}header{border-bottom:1px solid var(--line);padding:18px 0}
+.brand{display:flex;align-items:center;gap:14px}.brand img{width:74px;height:74px;object-fit:contain;border-radius:16px}.brand h1{margin:0;font-size:23px}.brand small{display:block;color:var(--g2);letter-spacing:2px;margin-top:5px}
 .hero{text-align:center;padding:34px 0 20px}.hero h2{font-size:34px;margin:0 0 8px}.hero p{color:var(--muted);margin:0}
 .search{display:flex;max-width:700px;margin:20px auto;background:var(--card);border:1px solid var(--line);border-radius:14px}.search input{width:100%;padding:15px;background:transparent;border:0;outline:0;color:#fff;font-size:16px}.search b{padding:15px;color:var(--g2)}
-.filters{display:flex;gap:8px;overflow:auto;padding:4px 0 20px}.filter{white-space:nowrap;border:1px solid var(--line);background:#101216;color:#ddd;padding:9px 15px;border-radius:999px}.filter.active{background:var(--g);color:#111;border-color:var(--g)}
+.filters{display:flex;gap:8px;overflow:auto;padding:4px 0 20px}.filter{white-space:nowrap;border:1px solid var(--line);background:#101216;color:#ddd;padding:9px 15px;border-radius:999px;cursor:pointer}.filter.active{background:var(--g);color:#111;border-color:var(--g)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:14px;padding-bottom:32px}.card{background:linear-gradient(145deg,#15181d,#0d0f12);border:1px solid var(--line);border-radius:18px;padding:18px}.tag{color:var(--g2);font-size:12px}.card h3{margin:8px 0}.spec{color:var(--muted);font-size:13px}.price{color:var(--g2);font-size:23px;font-weight:800;margin-top:15px}.stock{font-size:12px;color:#72d49a;margin-top:7px}.empty{color:var(--muted);padding:30px 0;text-align:center}
 .contact{text-align:center;border-top:1px solid var(--line);padding:28px 0 42px}.wa{display:inline-block;background:#1da866;color:#fff;text-decoration:none;padding:12px 18px;border-radius:11px;font-weight:700}
 footer{text-align:center;border-top:1px solid var(--line);padding:18px;color:#727984;font-size:12px}
-</style>
-</head>
+</style></head>
 <body>
-<header><div class="wrap brand"><img src="logo.png"><div><h1>Mi Kiren Technology Store</h1><small>TECHNOLOGY • PHONE • ACCESSORIES</small></div></div></header>
-<main class="wrap">
-<section class="hero"><h2>Güncel Telefon Fiyatları</h2><p>Fiyat ve stok bilgileri güncel liste üzerinden gösterilir.</p></section>
+<header><div class="wrap brand"><img src="logo.png" alt="Mi Kiren Technology Store"><div><h1>Mi Kiren Technology Store</h1><small>TECHNOLOGY • PHONE • ACCESSORIES</small></div></div></header>
+<main class="wrap"><section class="hero"><h2>Güncel Telefon Fiyatları</h2><p>Fiyat ve stok bilgileri güncel listeden gösterilir.</p></section>
 <div class="search"><b>⌕</b><input id="q" placeholder="Model veya hafıza ara..."></div>
-<div id="filters" class="filters"></div>
-<div id="grid" class="grid"></div>
-<section class="contact"><h3>Aradığınız ürünü bulamadınız mı?</h3><p style="color:#9da3ad">Güncel stok ve özel fiyat için WhatsApp'tan bize ulaşın.</p><a id="wa" class="wa" href="#">WhatsApp'tan Sor</a></section>
-</main><footer>© 2026 Mi Kiren Technology Store</footer>
+<div id="filters" class="filters"></div><div id="grid" class="grid"></div>
+<section class="contact"><h3>Aradığınız ürünü bulamadınız mı?</h3><p style="color:#9da3ad">Güncel stok ve özel fiyat için WhatsApp'tan bize ulaşın.</p>
+<a class="wa" target="_blank" href="https://wa.me/905367052869?text=Merhaba%2C%20telefon%20fiyatlar%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.">WhatsApp'tan Sor</a></section></main>
+<footer>© 2026 Mi Kiren Technology Store</footer>
 <script>
-/*
-GOOGLE SHEETS KURULUMU:
-1) Bir Google Sheet oluştur.
-2) İlk satıra şu başlıkları yaz:
-   Marka | Model | Özellik | Fiyat | Stok
-3) Dosya > Paylaş > Web'de yayınla > CSV olarak yayınla.
-4) Aşağıdaki SHEET_CSV_URL değerine oluşan CSV adresini yapıştır.
-5) WhatsApp numaranı WA_NUMBER alanına ülke koduyla yaz (ör: 905xxxxxxxxx).
-*/
-const SHEET_CSV_URL="BURAYA_GOOGLE_SHEETS_CSV_LINKI";
-const WA_NUMBER="905XXXXXXXXX";
-
-const demo=[
-["Apple","iPhone 15","128 GB • Sıfır","42.999 TL","Stokta"],
-["Apple","iPhone 16","128 GB • Sıfır","49.999 TL","Stokta"],
-["Apple","iPhone 16 Pro","256 GB • Sıfır","64.999 TL","Stokta"],
-["Samsung","Galaxy S25","256 GB • Sıfır","39.999 TL","Stokta"],
-["Samsung","Galaxy A56","256 GB • Sıfır","19.999 TL","Stokta"],
-["Xiaomi","Xiaomi 14T","256 GB • Sıfır","24.999 TL","Stokta"]
-];
+const SHEET_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTPA2gC4mHUSzPjDAUPMVLmQId2ZsrPSIIGoMisDN-O25tkCrwuYUeI-s6zcHlSaLDQfrsm2DNPnUiC/pub?output=csv";
+const demo=[["Apple","iPhone 15","128 GB • Sıfır","42.999 TL","Stokta"],["Apple","iPhone 16","128 GB • Sıfır","49.999 TL","Stokta"],["Samsung","Galaxy S25","256 GB • Sıfır","39.999 TL","Stokta"]];
 let rows=demo,active="Tümü";
 function parseCSV(s){return s.trim().split(/\r?\n/).map(line=>line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x=>x.replace(/^"|"$/g,"").replace(/""/g,'"'))).slice(1)}
-async function load(){if(!SHEET_CSV_URL.startsWith("http"))return;try{const r=await fetch(SHEET_CSV_URL);const t=await r.text();const p=parseCSV(t);if(p.length)rows=p}catch(e){console.log("Demo liste kullanılıyor",e)}}
-function render(){const q=document.getElementById("q").value.toLowerCase();const brands=["Tümü",...new Set(rows.map(x=>x[0]).filter(Boolean))];document.getElementById("filters").innerHTML=brands.map(b=>`<button class="filter ${b===active?'active':''}" onclick="active='${b.replaceAll("'","\\'")}';render()">${b}</button>`).join("");const list=rows.filter(x=>(active==="Tümü"||x[0]===active)&&x.slice(0,3).join(" ").toLowerCase().includes(q));document.getElementById("grid").innerHTML=list.length?list.map(x=>`<article class="card"><span class="tag">${x[0]||""}</span><h3>${x[1]||""}</h3><div class="spec">${x[2]||""}</div><div class="price">${x[3]||""}</div><div class="stock">● ${x[4]||"Bilgi yok"}</div></article>`).join(""):`<div class="empty">Aradığınız ürün bulunamadı.</div>`}
-document.getElementById("q").addEventListener("input",render);document.getElementById("wa").onclick=e=>{e.preventDefault();if(WA_NUMBER.includes("X"))alert("Önce WA_NUMBER alanına WhatsApp numaranı yaz.");else location.href=`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Merhaba, telefon fiyatları hakkında bilgi almak istiyorum.")}`};load().then(render);
-</script>
-</body></html>
+async function load(){try{const r=await fetch(SHEET_CSV_URL);const t=await r.text();const p=parseCSV(t);if(p.length)rows=p}catch(e){console.log("CSV alınamadı, demo liste kullanılıyor")}render()}
+function render(){
+ const q=document.getElementById("q").value.toLowerCase();
+ const brands=["Tümü",...new Set(rows.map(x=>x[0]).filter(Boolean))];
+ document.getElementById("filters").innerHTML=brands.map(b=>`<button class="filter ${b===active?'active':''}" data-brand="${b}">${b}</button>`).join("");
+ document.querySelectorAll(".filter").forEach(btn=>btn.onclick=()=>{active=btn.dataset.brand;render()});
+ const list=rows.filter(x=>(active==="Tümü"||x[0]===active)&&x.slice(0,3).join(" ").toLowerCase().includes(q));
+ document.getElementById("grid").innerHTML=list.length?list.map(x=>`<article class="card"><span class="tag">${x[0]||""}</span><h3>${x[1]||""}</h3><div class="spec">${x[2]||""}</div><div class="price">${x[3]||""}</div><div class="stock">● ${x[4]||"Bilgi yok"}</div></article>`).join(""):`<div class="empty">Aradığınız ürün bulunamadı.</div>`;
+}
+document.getElementById("q").addEventListener("input",render);load();
+</script></body></html>
